@@ -66,7 +66,7 @@ int main(int argc, char const *argv[])
         MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
              len);  
 
-	cout << " Data sent" << endl;
+	cout << " Packet sent" << endl;
     }
     return 0; 
 }  

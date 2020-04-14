@@ -9,10 +9,10 @@
 #include <string.h> 
 #include<string>
 #include <chrono>
-#define ITER 100
+#define ITER 1000
 #include <vector>
 
-#define PORT 8081 //client port no 
+#define PORT 8086 //client port no 
 #define MICROSECONDS 1000 // microseconds 
 using namespace std;
 
@@ -32,13 +32,19 @@ int main(int argc, char const *argv[])
 	} 
 	memset(&servaddr,0,sizeof(sockaddr_in));
 	memset(&cliaddr, 0 , sizeof(sockaddr_in));
-	cliaddr.sin_family = AF_INET; 
-	cliaddr.sin_port = htons(PORT); 
-	cliaddr.sin_addr.s_addr = INADDR_ANY; //ip address of 127.0.0.1
 	
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(8080);
-	servaddr.sin_addr.s_addr = INADDR_ANY;
+	servaddr.sin_port = htons(PORT);
+	//servaddr.sin_addr.s_addr = INADDR_ANY;
+	// Convert IPv4 and IPv6 addresses from text to binary form 
+	if(inet_pton(AF_INET,  "192.168.43.28", &servaddr.sin_addr.s_addr)<=0) 
+	{ 
+		cout << "Invalid address/ Address not supported"<<endl;
+
+		return -1; 
+	} 
+	
+	
 	
 	if(bind(sock, (const sockaddr*) &cliaddr, sizeof(struct sockaddr_in)) == -1)
 	{
@@ -55,11 +61,12 @@ int main(int argc, char const *argv[])
 	socklen_t len;
 	len = sizeof(struct sockaddr_in);
 
+
 	for (int i=0; i<=ITER; i++)
 	{
 	// preparing data packet
 	string val = to_string(i);
-	string final_str1 = " packet number:";
+	string final_str1 = " packet no:";
 	final_str1.append(val);
 	const char*final_str = final_str1.data(); 
 	
@@ -68,15 +75,15 @@ int main(int argc, char const *argv[])
 	usleep(MICROSECONDS);
 	int n;
 
-	
 	//controller program starting counter	
 	auto start_SR = std::chrono::high_resolution_clock::now();
 
 	sendto(sock, final_str, strlen(final_str), 
         MSG_CONFIRM, (const sockaddr*) &servaddr, sizeof(sockaddr_in));	
 
-	cout << "Packet Sent" << endl;	
-	cout << final_str << endl;
+	
+	
+	cout << "packet_sent"<<final_str << endl;
 	
 	// Going to recieve the packet_sent	
 	n = recvfrom(sock, (char *)buffer,1024,  
@@ -102,9 +109,9 @@ int main(int argc, char const *argv[])
 		
 
 	end_pac = std::chrono::high_resolution_clock::now(); 
-    auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>( end_pac - start_pac ).count();
-	cout << " Between Packet " << i << "and " << i+1 << " is :" << float(duration2)/1000 << " miliseconds" << endl;
-			durArray[i]= float(duration1);
+	auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>( end_pac - start_pac ).count();
+	cout << " Between Packet " << i << "and " << i+1 << " is :" << float(duration2) / 1000  << " miliseconds" << endl;
+	durArray[i]= float(duration1)/1000;
 
 	start_pac = end_pac;
 }
@@ -114,22 +121,19 @@ int main(int argc, char const *argv[])
 	Worst_Time = *max_element(durArray.begin(), durArray.end());
 
 
-	cout<<"Best_Time = "<< float(Best_Time) << "  microseconds"  <<endl;
-	cout<<"Worst_Time = "<< float(Worst_Time) << "  microseconds"  <<endl;
+	cout<<"Best_Time = "<< (Best_Time) << "microseconds" <<endl;
+	cout<<"Worst_Time = "<< float(Worst_Time) << "microseconds" <<endl;
 
 	Average_Time = 0;
 	for (int i=0; i<=ITER; i++)
 	{
-		
-		
 
 		Average_Time = Average_Time + durArray[i];
-		//cout << "durArray[i]" << float(durArray[i])/1000 << endl;
-		
-	}
-	Average_Time = Average_Time/ITER;
 
-	cout << "Average_Time = " << float(Average_Time) << " microseonds" << endl;
+	}
+	Average_Time = (float (Average_Time)) / ITER;
+
+	cout << "Average_Time = " << float(Average_Time) << "microseconds" << endl;
 	std_dvtn = 0;
 	for (int i=0; i<=ITER; i++)
 	{

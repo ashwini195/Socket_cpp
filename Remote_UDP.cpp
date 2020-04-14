@@ -8,7 +8,7 @@
 #include <arpa/inet.h> 
 
 
-#define PORT 8080 
+#define PORT 8086
 using namespace std;
 int main(int argc, char const *argv[]) 
 { 
@@ -54,21 +54,19 @@ int main(int argc, char const *argv[])
 	len=sizeof(cliaddr);   
     while(1)
     {
-	cout << " waiting to recieve the data..............." << endl;
+	printf(" waiting to recieve the data\n");
 	n = recvfrom(server_fd, (char *)buffer,1024,  
                 MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
                 (socklen_t*)&len);  
     buffer[n] = '\0'; 
     
-
+	
 	cout << buffer << endl;
 	sendto(server_fd, (const char *)buffer, strlen(buffer),  
         MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
              len);  
 
-	cout << "Packet sent" << endl;
+	cout << " Data sent" << endl;
     }
     return 0; 
 }  
-
-

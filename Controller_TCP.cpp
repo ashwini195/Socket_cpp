@@ -129,11 +129,22 @@ int main(int argc, char const *argv[])
 
 	cout << "Average_Time = " << float(Average_Time) << "  microseonds" << endl;
 	std_dvtn = 0;
+	
 	for (int i=0; i<=ITER; i++)
 	{
 		std_dvtn = std_dvtn + pow(durArray[i] -Average_Time, 2);
 	}
-	std_dvtn = pow(std_dvtn/(ITER - 1), 0.5);
+	std_dvtn = sqrt(std_dvtn/(ITER - 1));
+	
+	for(int i=0; i<=ITER;i++)
+	{
+		skew = pow((durArray[i] -Average_Time),3);
+	}
+	skew = (skew/((ITER-1)*(std_dvtn*std_dvtn*std_dvtn)));
+
+	
+	cout << "skew " << skew <<endl;
+	
 	cout<< "std_deviation = " << std_dvtn << endl;
 
 
